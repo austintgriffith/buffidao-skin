@@ -1,0 +1,11 @@
+.sky-gradient-06 {
+  background: linear-gradient(to bottom, #0a1411 0%,#372e56 20%,#df5089 100%);
+}
+
+
+.title {
+  transform-origin: top center;
+  transform: scaleY(2) scaleX(0.85);
+  font-family: 'Squada One', Impact, Arial, Helvetica, sans-serif;
+  line-height: 0.777;
+}
