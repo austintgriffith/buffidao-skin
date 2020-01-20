@@ -1,15 +1,18 @@
-import React, { useLayoutEffect, useState, useEffect } from 'react';
+import React, { useLayoutEffect, useState, useEffect, useRef } from 'react';
 import stars from "./stars.png"
-import pegabuff from "./pegabuff.png"
+import pegabuff from "./pegabufficorn.png"
+import pegabuff2 from "./pegabufficorn2.png"
 import trees from "./trees.png"
 import qrscan from "./qrscan.png"
+import profile from "./profile.png"
 import xpmeter from "./xpmeter.png"
 import valuehud from "./valuehud.png"
 
 import './App.css';
 
 const STARTLOGGEDIN = false
-
+const SHOWOWOCKI = false
+const SHOWBOUNTIES = false
 
 function useWindowSize() {
   const [size, setSize] = useState([0, 0]);
@@ -56,6 +59,11 @@ const drawLayer = (index,img,width,left,top,perspective,opacity,scaleY,brightnes
   if(typeof opacity != "undefined"){
       thisOpacity = opacity
   }
+
+  if(thisOpacity==1){
+  thisOpacity = 0.99
+  }
+
   let thisScaleY = 1.0
   if(typeof scaleY != "undefined"){
     thisScaleY = scaleY
@@ -77,11 +85,31 @@ const drawLayer = (index,img,width,left,top,perspective,opacity,scaleY,brightnes
 }
 
 
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
 
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
 
 function App() {
   const [openedBuilding, setOpenedBuilding] = useState(STARTLOGGEDIN);
   const [loggedIn, setLoggedIn] = useState(STARTLOGGEDIN);
+
+  const [mode, setMode] = useState(0);
 
   const [scrollY, setScrollY] = useState(0);
   const [scrollX, setScrollX] = useState(0);
@@ -90,6 +118,11 @@ function App() {
     setScrollY(window.scrollY)
     setScrollX(window.scrollX)
   };
+
+  useInterval(() => {
+    // Your custom logic here
+    setMode(!mode)
+  }, 50);
 
   useEffect(() => {
     window.addEventListener("scroll", listener);
@@ -285,10 +318,10 @@ function App() {
       <div style={{position:"relative",zIndex:999,cursor:"pointer",width:"80%"}} onClick={()=>{
           alert("click")
       }}>
-        <div style={{margin:4,padding:"6",backgroundColor:"#EEEEEE",borderRadius:6,borderBottom:"4px solid #9d9d9d"}}>
+        <div style={{margin:4,zIndex:999,padding:"6",backgroundColor:"#EEEEEE",borderRadius:6,borderBottom:"4px solid #9d9d9d"}}>
           <span style={{verticalAlign:"middle",color:"#444444",fontSize:"26"}} className={"title"}><span style={{color:color}}>{location}: </span> {task}</span>
         </div>
-        <div style={{position:"absolute",right:8,top:0, opacity:0.5}}>
+        <div style={{zIndex:999,position:"absolute",right:8,top:0, opacity:0.5}}>
           +{xp} XP
         </div>
       </div>
@@ -332,20 +365,35 @@ function App() {
     layers.push(drawLayer(layerCount++,castleFiles["./floor1.png"],layerWidth,-layerLeft,layer1Bottom+scrollOffsetBuilding,sidewalkPerspective,1,1,100,floor1Buttons))
 
 
-
-
     let layer2Bottom = coverMax
     let stickPointLayer2 = layer1Bottom - height * buildingLayerSpread
 
-    if(layer2Bottom < stickPointLayer2*(0.8) ){
-      layer2Bottom = stickPointLayer2
-      let floor2Buttons = (
-        <div style={buttonBoxStyle}>
 
-        </div>
-      )
-      layers.push(drawLayer(layerCount++,castleFiles["./floor2.png"],layerWidth,-layerLeft,layer2Bottom+scrollOffsetBuilding,sidewalkPerspective,1,1,100,floor2Buttons))
+
+    if(!SHOWOWOCKI){
+
+      if(layer2Bottom < stickPointLayer2*(0.8) ){
+        layer2Bottom = stickPointLayer2
+        let floor2Buttons = (
+          <div style={buttonBoxStyle}>
+
+          </div>
+        )
+        layers.push(drawLayer(layerCount++,castleFiles["./floor2.png"],layerWidth,-layerLeft,layer2Bottom+scrollOffsetBuilding,sidewalkPerspective,1,1,100,floor2Buttons))
+      }
+    }else{
+
+      if(layer2Bottom < stickPointLayer2*(0.8) ){
+        layer2Bottom = stickPointLayer2
+        let floor2Buttons = (
+          <div style={buttonBoxStyle}>
+            {questButton("Owacki Sacki","#7381b5","Talk OSS",75)}
+          </div>
+        )
+        layers.push(drawLayer(layerCount++,castleFiles["./floor2_owocki.png"],layerWidth,-layerLeft,layer2Bottom+scrollOffsetBuilding,sidewalkPerspective,1,1,100,floor2Buttons))
+      }
     }
+
 
     let layer3Bottom = coverMax
     let stickPointLayer3 = layer2Bottom - height * buildingLayerSpread*1.2
@@ -366,10 +414,30 @@ function App() {
 
     let layer5Bottom = coverMax
     let stickPointLayer5 = layer4Bottom - height * buildingLayerSpread
-    if(layer5Bottom < stickPointLayer5 ){
-      layer5Bottom = stickPointLayer5
-      layers.push(drawLayer(layerCount++,castleFiles["./floor5.png"],layerWidth,-layerLeft,layer5Bottom+scrollOffsetBuilding,sidewalkPerspective))
+
+
+    if(SHOWBOUNTIES){
+      if(layer5Bottom < stickPointLayer5 ){
+        let floor5Buttons = (
+          <div style={buttonBoxStyle}>
+            {questButton("Bounties Network","#f1c673","Mimosas with Simona",95)}
+          </div>
+        )
+        layer5Bottom = stickPointLayer5
+        layers.push(drawLayer(layerCount++,castleFiles["./floor5_wtf.png"],layerWidth,-layerLeft,layer5Bottom+scrollOffsetBuilding,sidewalkPerspective,1,1,100,floor5Buttons))
+      }
+    }else{
+      if(layer5Bottom < stickPointLayer5 ){
+        let floor5Buttons = (
+          <div style={buttonBoxStyle}>
+
+          </div>
+        )
+        layer5Bottom = stickPointLayer5
+        layers.push(drawLayer(layerCount++,castleFiles["./floor5.png"],layerWidth,-layerLeft,layer5Bottom+scrollOffsetBuilding,sidewalkPerspective,1,1,100,floor5Buttons))
+      }
     }
+
 
     let layer6Bottom = coverMax
     let stickPointLayer6 = layer5Bottom - height * buildingLayerSpread
@@ -388,12 +456,18 @@ function App() {
   //
   //<div style={{zIndex:3,backgroundColor:"#282828",width:width,height:height,position:"fixed",top:rangePercent(scrollPercent,height*0.8,height*0.18)}}></div>
   //
+  //
+
+  let buffImage = mode?pegabuff:pegabuff2
+
   return (
     <div style={{width:"100%",textAlign:"center",backgroundColor:"#000000"}}>
 
+      <div style={{filter:"drop-shadow(0px 0px 4px #222222)",zIndex:999,position:"fixed",top:15,right:0}}>
+        <img src={profile} style={{maxWidth:180}}></img>
+      </div>
 
-
-      <div style={{filter:"drop-shadow(0px 0px 4px #222222)",zIndex:999,position:"fixed",top:10,right:0}}>
+      <div style={{filter:"drop-shadow(0px 0px 4px #222222)",zIndex:999,position:"fixed",top:69,right:0}}>
         <img src={xpmeter} style={{maxWidth:130}}></img>
       </div>
 
@@ -411,7 +485,7 @@ function App() {
           <img src={stars} style={{minWidth:width}} />
         </div>
 
-        <div className={"title"} style={{position:"fixed",top:height*0.05-scrollY/3,width:width,height:height,overflow:"hidden"}}>
+        <div className={"title"} style={{position:"fixed",top:height*0.09-scrollY/3,width:width,height:height,overflow:"hidden"}}>
           <div style={{color:"#efefef",fontSize:"30pt"}}>B<span style={{color:"#efefef",fontSize:"28pt"}}>UFFI</span>DAO</div>
           <div style={{color:"#adadad",fontSize:"12pt"}}>ETHDENVER 2020</div>
         </div>
@@ -437,10 +511,10 @@ function App() {
 
 
 
-        <div style={{position:"fixed",top:0,width:width,height:height*screenRatio,overflow:"hidden"}}>
+        <div style={{position:"fixed",top:height*0.1,width:width,height:height*screenRatio}}>
           {layers}
-          <div style={{zIndex:255,position:"absolute",right:width*1/20+scrollX/2,top:rangePercent(scrollPercent,height*0.13,-height*0.4)}}>
-            <img src={pegabuff} style={{maxWidth:width/3.5}} />
+          <div style={{zIndex:255,position:"absolute",right:scrollX/2,top:rangePercent(scrollPercent,0,-height*0.8)}}>
+            <img src={buffImage} style={{maxWidth:width/1.5}} />
           </div>
         </div>
 
